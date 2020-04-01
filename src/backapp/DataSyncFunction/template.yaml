@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Sample SAM Template for 
+  
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  MyEventSourceMapping: 
+    Type: AWS::Lambda::EventSourceMapping
+    Properties: 
+      EventSourceArn: arn:aws:cognito-idp:ap-northeast-2:786923391258:userpool/ap-northeast-2_au26s0I5c
+      FunctionName:
+        Fn::GetAtt: 
+        - "DataSyncFunction"
+        - "Arn"
+      StartingPosition: "TRIM_HORIZON"
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+            - Effect: Allow
+              Principal:
+                  Service: lambda.amazonaws.com
+              Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: VPCAccessPolicy
+          PolicyDocument:
+              Version: 2012-10-17
+              Statement:
+                  - Effect: Allow
+                    Action:
+                        - ec2:DeleteNetworkInterface
+                        - ec2:DescribeNetworkInterfaces
+                        - ec2:CreateNetworkInterface
+                        - logs:PutLogEvents
+                        - logs:CreateLogStream
+                        - logs:CreateLogGroup
+                    Resource: "*"
+
+  DataSyncFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Handler: app.lambdaHandler
+      Runtime: nodejs10.x
+      VpcConfig:
+        SecurityGroupIds: 
+          - sg-f6910a95
+        SubnetIds: 
+          - subnet-87bc73ec
+          - subnet-e0c57d9b
+          - subnet-e93704a5
+
+
+Outputs:
+  DataSyncFunction:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  DataSyncFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt DataSyncFunction.Arn
+  LambdaExecutionRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt LambdaExecutionRole.Arn

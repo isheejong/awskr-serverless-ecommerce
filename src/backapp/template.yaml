@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  PersistUserInfo
+  Sample SAM Template for PersistUserInfo
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+          Version: 2012-10-17
+          Statement:
+              - Effect: Allow
+                Principal:
+                    Service: lambda.amazonaws.com
+                Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: VPCAccessPolicy
+          PolicyDocument:
+              Version: 2012-10-17
+              Statement:
+                  - Effect: Allow
+                    Action:
+                        - ec2:DeleteNetworkInterface
+                        - ec2:DescribeNetworkInterfaces
+                        - ec2:CreateNetworkInterface
+                        - logs:PutLogEvents
+                        - logs:CreateLogStream
+                        - logs:CreateLogGroup
+                    Resource: "*"
+
+  FunctionPersistUserInfo:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Role: !Sub ${LambdaExecutionRole.Arn}
+      Events:
+        HelloWorld:
+          Type: Api # 
+          Properties:
+            Path: /persist
+            Method: Post
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  HelloWorldApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  FunctionPersistUserInfo:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt FunctionPersistUserInfo.Arn
+  LambdaExecutionRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt LambdaExecutionRole.Arn

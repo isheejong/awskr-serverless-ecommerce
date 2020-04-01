@@ -1,0 +1,15 @@
+{
+    "trigger": true,
+    "modules": [
+        "custom"
+    ],
+    "parentResource": "kestoreskeleton1c0766b91c0766b9",
+    "functionName": "kestoreskeleton1c0766b91c0766b9PostConfirmation",
+    "resourceName": "kestoreskeleton1c0766b91c0766b9PostConfirmation",
+    "parentStack": "auth",
+    "triggerEnvs": [],
+    "triggerDir": "/Users/heejonglee/.npm-global/lib/node_modules/@aws-amplify/cli/node_modules/amplify-category-auth/provider-utils/awscloudformation/utils/../triggers/PostConfirmation",
+    "triggerTemplate": "PostConfirmation.json.ejs",
+    "roleName": "kestoreskeleton1c0766b91c0766b9PostConfirmation",
+    "skipEdit": true
+}
